@@ -489,8 +489,15 @@ func (v *VoiceConnection) onEvent(message []byte) {
 		}
 
 		// TODO: error handling? meh
-		block, _ := aes.NewCipher(v.op4.SecretKey[:])
-		v.aead, _ = cipher.NewGCM(block)
+		block, err := aes.NewCipher(v.op4.SecretKey[:])
+		if err != nil {
+			v.log(LogError, "unhandled error creating new cipher block, %s", err)
+		}
+
+		v.aead, err = cipher.NewGCM(block)
+		if err != nil {
+			v.log(LogError, "unhandled error creating new GCM cipher, %s", err)
+		}
 
 		return
 
